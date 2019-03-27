@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Detail {% endblock %}
+
+{% form_theme formDateVersion 'bootstrap_4_layout.html.twig' %}
+
+{% block body %}
+
+{{ form_start(formDateVersion)}}
+    <span>Select Version:</span>
+    {{ form_row(formDateVersion) }}
+    <br>
+    <button type="submit" class="btn btn-success" >Search</button>
+{{ form_end(formDateVersion)}}
+
+<br>
+
+<div class="example-wrapper">
+    <h3>Company detail :</h3>
+    {% if isVersion%}
+        <span>Version : {{dateFiltre | date('Y-m-d H:i')}}</span>
+    {% endif %}
+    <hr>
+
+    <div class="row">
+        <div class="col-4">
+            <b>Name :</b>
+        </div>
+        <div class="col-4">
+            {{company.name}}
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-4">
+            <b>City Of the registration :</b>
+        </div>
+        <div class="col-4">
+            {{company.cityOfRegistration}}
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-4">
+            <b>Registration date :</b>
+        </div>
+        <div class="col-4">
+            {{company.registrationDate |date('Y-m-d H:i') }}
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-4">
+            <b>capital :</b>
+        </div>
+        <div class="col-4">
+            {{company.capital}}
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-4">
+            <b>legalForm :</b>
+        </div>
+        <div class="col-4">
+            {{company.legalForm.name}}
+        </div>
+    </div>
+    <br>
+
+    
+    <div class="row">
+        <div class="col-4">
+            <b>Addresses :</b>
+        </div>
+        <div class="col-4">
+            {% for address in company.addresses %}    
+                <p>{{address.number}} {{address.type}} {{address.name}}, {{address.city}}  {{address.zipCode}}</p>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <a href="{{path('edit_company',{'id' : company.id})}}" class="btn btn-primary" >Edit</a>
+
+</div>
+{% endblock %}

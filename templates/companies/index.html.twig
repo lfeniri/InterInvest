@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Companies{% endblock %}
+
+{% block body %}
+<h1> List of companies : </h1>
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th scope="col">Name</th>
+        <th scope="col">City of registration</th>
+        <th scope="col">Capital</th>
+        <th scope="col">Action</th>
+    </tr>
+    </thead>
+    <tbody> 
+        {% for company in companies %}
+            <tr class="table-active">    
+                <th scope="row">{{company.name}}</th>
+                <td>{{company.cityOfRegistration}}</td>
+                <td>{{company.capital}}</td>
+                <td><a href="{{path('company_detail',{'id' : company.id})}}" class="btn btn-primary" >Detail</a></td>
+            </tr>           
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="row p-5">
+        {% if page > 1 %}
+            <a href="{{path('companies',{'page': page - 1})}}" class="col align-self-start btn btn-primary" >Prev</a>
+        {% endif %}
+        <a href="{{path('companies',{'page': page + 1})}}" class="col align-self-end btn btn-primary" >Next</a>          
+</div>
+{% endblock %}

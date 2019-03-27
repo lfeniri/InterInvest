@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create and update{% endblock %}
+
+{% form_theme formCompany 'bootstrap_4_layout.html.twig' %}
+{% block body %}
+    <h1> 
+    {% if isUpdate %}
+        Edit the company
+    {% else %}
+        Create company
+    {% endif %}
+    
+    </h1>
+
+    {{ form_start(formCompany)}}
+        
+        {{ form_row(formCompany.name) }}
+        {{ form_row(formCompany.sirenNumber) }}
+        {{ form_row(formCompany.cityOfRegistration) }}
+        {{ form_row(formCompany.registrationDate) }}
+        {{ form_row(formCompany.capital) }}
+        {{ form_row(formCompany.legalForm) }}
+        {{form_label(formCompany.addresses)}}
+        <div class="well"   id="address-fields-list"
+                            data-prototype="<div class='col-sm-3'>{{ form_row(formCompany.addresses.vars.prototype.number)|e }}</div>
+                                            <div class='col-sm-3'>{{ form_row(formCompany.addresses.vars.prototype.type)|e }}</div>
+                                            <div class='col-sm-6'>{{ form_row(formCompany.addresses.vars.prototype.name)|e }}</div>
+                                            <div class='col-sm-4'>{{ form_row(formCompany.addresses.vars.prototype.city)|e }}</div>
+                                            <div class='col-sm-3'>{{ form_row(formCompany.addresses.vars.prototype.zipCode)|e }}</div>
+                                            <button type='button' class='delete-address btn btn-danger'>Delete</button>"
+                            data-widget-tags="{{ '<div class="card"></div>'|e }}"
+                            data-widget-counter="{{ formCompany.addresses.children|length }}">
+            
+            
+            {% for address in formCompany.addresses %}
+                <div class="card">
+                    <div class="row">
+                        <div class="col-sm-3">{{ form_row(address.number) }}</div>
+                        <div class="col-sm-3">{{ form_row(address.type) }}</div>
+                        <div class="col-sm-6">{{ form_row(address.name) }}</div>
+                        <div class="col-sm-4">{{ form_row(address.city) }}</div>
+                        <div class="col-sm-3">{{ form_row(address.zipCode) }}</div>
+                        <button type="button"
+                            class="delete-address btn btn-danger">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+            
+       </div>
+
+        <button type="button"
+            class="add-address btn btn-primary"
+            data-list-selector="#address-fields-list">
+            Add Address
+        </button>
+        <hr>
+        <button type="submit" class="btn btn-success" >
+        {% if isUpdate %}
+            Update
+        {% else %}
+            Create
+        {% endif %}
+        </button> 
+
+    {{ form_end(formCompany)}}
+{% endblock %}
