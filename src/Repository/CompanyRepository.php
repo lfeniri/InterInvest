@@ -78,8 +78,11 @@ public function findAllPagineTrie($page,$maxSize){
     if ( ($paginator->count() <= $maxSize*($page-1)) && $page != 1) {
         throw new NotFoundHttpException('Page not exist.');
     }
-    dump($paginator);
-    return $paginator;
+
+    return [ 
+        'list'      => $paginator, 
+        'nbPages'   => ceil($paginator->count()/$maxSize),
+    ];
 }
 
 }

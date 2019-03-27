@@ -146,28 +146,34 @@ class Company
         return $this;
     }
 
+    public function setAddresses($addresses): self
+    {
+        $this->addresses = $addresses;
+        return $this;
+    }
+
+    /**
+     * @return Collection|Address[]
+     */
+    public function getAllAddresses()
+    {
+        return $this->addresses;
+    }
+
     /**
      * @return Collection|Address[]
      */
     public function getAddresses(): Collection
     {
-        return $this->addresses;
+        $liste = new ArrayCollection();
+        foreach($this->getAllAddresses() as $address) {
+            if(!$address->isDeleted()) {
+                $liste->add($address);
+            }
+        }
+        return $liste;
     }
 
-    public function removeAllAddresses(): self
-    {
-        foreach($this->addresses as $address) {
-            $this->removeAddress($address);
-        }
-        return $this;
-    }
-    public function addListOfAddresses($addressesList): self
-    {
-        foreach($this->addressesList as $address) {
-            $this->addAddress($address);
-        }
-        return $this;
-    }
 
     public function addAddress(Address $address): self
     {
@@ -183,11 +189,7 @@ class Company
     public function removeAddress(Address $address): self
     {
         if ($this->addresses->contains($address)) {
-            $this->addresses->removeElement($address);
-            // set the owning side to null (unless already changed)
-            if ($address->getCompany() === $this) {
-                $address->setCompany(null);
-            }
+            $address->setIsDeleted(true);
         }
 
         return $this;

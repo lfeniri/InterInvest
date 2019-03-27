@@ -31,11 +31,8 @@ class CreateAndUpdateController extends AbstractController
         
         $form->handleRequest($request);
 
-        
-
         if($form->isSubmitted() && $form->isValid()){
             $manager->persist($company);
-            dump($company);
             $manager->flush();
             return $this->redirectToRoute('company_detail',['id' => $company->getId()]);
         }

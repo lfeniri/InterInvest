@@ -15,6 +15,10 @@
 
     {{ form_start(formCompany)}}
         
+        {% for error in formCompany.vars.errors %}
+            {{ error.message }}
+        {% endfor %}
+        
         {{ form_row(formCompany.name) }}
         {{ form_row(formCompany.sirenNumber) }}
         {{ form_row(formCompany.cityOfRegistration) }}
@@ -22,6 +26,7 @@
         {{ form_row(formCompany.capital) }}
         {{ form_row(formCompany.legalForm) }}
         {{form_label(formCompany.addresses)}}
+        
         <div class="well"   id="address-fields-list"
                             data-prototype="<div class='col-sm-3'>{{ form_row(formCompany.addresses.vars.prototype.number)|e }}</div>
                                             <div class='col-sm-3'>{{ form_row(formCompany.addresses.vars.prototype.type)|e }}</div>

@@ -55,6 +55,12 @@ class Address
      */
     private $company;
 
+    /**
+     * @Gedmo\Versioned
+     * @ORM\Column(type="boolean", nullable=false)
+     */
+    private $isDeleted = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -131,4 +137,17 @@ class Address
 
         return $this;
     }
+
+    public function isDeleted()
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted($isDeleted):self
+    {
+        $this->isDeleted = $isDeleted;
+
+        return $this;
+    }
+
 }

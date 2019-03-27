@@ -30,6 +30,9 @@
         {% if page > 1 %}
             <a href="{{path('companies',{'page': page - 1})}}" class="col align-self-start btn btn-primary" >Prev</a>
         {% endif %}
-        <a href="{{path('companies',{'page': page + 1})}}" class="col align-self-end btn btn-primary" >Next</a>          
+        
+        {% if page < nbPages %}
+            <a href="{{path('companies',{'page': page + 1})}}" class="col align-self-end btn btn-primary" >Next</a>          
+        {% endif %}
 </div>
 {% endblock %}

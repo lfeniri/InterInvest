@@ -20,85 +20,83 @@ class CompaniesController extends AbstractController
      */
     public function index($page,ObjectManager $manager)
     {
-
+        
         $repo = $manager->getRepository(Company::class);
 
-        $companies = $repo->findAllPagineTrie($page,5);
+        $result = $repo->findAllPagineTrie($page,5);
 
         return $this->render('companies/index.html.twig', [
-            'companies' => $companies,
-            'page' => $page
+            'companies' => $result['list'],
+            'nbPages'   => intval($result['nbPages']),
+            'page' => intval($page)
         ]);
     }
 
 
 
     /**
-     * @Route("/company/detail/{id}/version", name="company_detail_version")
+     * 
      * @Route("/company/detail/{id}", name="company_detail")
      */
-    public function detail($id,Company $company=null,ObjectManager $manager,Request $request)
+    public function detail($id,Company $company,ObjectManager $manager,Request $request)
     {
-        $dateFiltre = \DateTime::createFromFormat('Y-m-d H:i:s', '2019-03-26 13:13:00');
-        $formDateVersion = $this->createForm(DateTimeType::class, null, ['with_seconds' => true]);
-        dump($formDateVersion);
+        $dateFiltre = \DateTime::createFromFormat('Y-m-d H:i:s', date('Y-m-d H:i:s'));
+        $formDateVersion = $this->createForm(DateTimeType::class, $dateFiltre, ['with_seconds' => true]);
         $formDateVersion->handleRequest($request);
-        dump($dateFiltre);
-        if($company == null){
-            $company = new Company();
-        }
 
-            $IsVersion = false;
-            if($formDateVersion->isSubmitted() && $formDateVersion->isValid()){
-                $IsVersion = true;
+        $IsVersion = false;
+        if($formDateVersion->isSubmitted() && $formDateVersion->isValid()){
+            $IsVersion = true;
+
+            $date = $formDateVersion->get('date')->getData();
+            $time = $formDateVersion->get('time')->getData();
+            $dateFiltre = $date['year'] . '-' . $date['month'] . '-' . $date['day']. ' ' 
+                        . $time['hour']. ':' . $time['minute']. '-' . $time['second'];
             
-                $gedmo = $manager->getRepository(LogEntry::class);
-        
-     
-                $queryCompany = $gedmo
-                    ->createQueryBuilder('version')
-                    ->where('version.objectClass = :CLASS')
-                    ->andWhere('version.objectId = :ID')
-                    ->andWhere('version.loggedAt <= :DATE')
-                    ->setParameter('CLASS', Company::class)
-                    ->setParameter('ID', $company->getId())
-                    ->setParameter('DATE', $dateFiltre)
-                    ->orderBy('version.loggedAt', 'DESC')
-                    ->setMaxResults(1);
-                
-        
-                $version = $queryCompany->getQuery()->getOneOrNullResult();
-        
-                $addresses = [];
-                if($version != null){
-                    $gedmo->revert($company,$version->getVersion());
-        
-                    foreach ($company->getAddresses() as $address) {
-                        dump($address);
-                        $query = $gedmo
-                            ->createQueryBuilder('version')
-                            ->where('version.loggedAt <= :DATE')
-                            ->andWhere('version.objectClass = :CLASS')
-                            ->andWhere('version.objectId = :ID')
-                            ->setParameters([
-                                'DATE'  => $dateFiltre,
-                                'CLASS' => Address::class,
-                                'ID'    => $address->getId(),
-                            ])
-                            ->orderBy('version.loggedAt', 'DESC')
-                            ->setMaxResults(1);
-        
-                        $versionAddress = $query->getQuery()->getOneOrNullResult();
-                       if(!is_null($versionAddress)){
-                            $gedmo->revert($address, $versionAddress->getVersion());
-                            $addresses[] = $address;
-                        }
-                     }
-                    $company->removeAllAddresses();
-        
+            $gedmo = $manager->getRepository(LogEntry::class);
+    
+            $queryCompany = $gedmo
+                ->createQueryBuilder('version')
+                ->where('version.objectClass = :CLASS')
+                ->andWhere('version.objectId = :ID')
+                ->andWhere('version.loggedAt <= :DATE')
+                ->setParameter('CLASS', Company::class)
+                ->setParameter('ID', $company->getId())
+                ->setParameter('DATE', $dateFiltre)
+                ->orderBy('version.loggedAt', 'DESC')
+                ->setMaxResults(1);
+    
+            $version = $queryCompany->getQuery()->getOneOrNullResult();
+    
+            $addresses = [];
+            if($version != null){
+                $gedmo->revert($company,$version->getVersion());
+    
+                foreach ($company->getAllAddresses() as $address) {
+                    $query = $gedmo
+                        ->createQueryBuilder('version')
+                        ->where('version.loggedAt <= :DATE')
+                        ->andWhere('version.objectClass = :CLASS')
+                        ->andWhere('version.objectId = :ID')
+                        ->setParameters([
+                            'DATE'  => $dateFiltre,
+                            'CLASS' => Address::class,
+                            'ID'    => $address->getId(),
+                        ])
+                        ->orderBy('version.loggedAt', 'DESC')
+                        ->setMaxResults(1);
+    
+                    $versionAddress = $query->getQuery()->getOneOrNullResult();
+                    if(!is_null($versionAddress)){
+                        $gedmo->revert($address, $versionAddress->getVersion());
+                        $addresses[] = $address;
+                    }
                 }
+                $company->setAddresses($addresses);
+            } else {
+                $company = null;
             }
-
+        }
         
         return $this->render('companies/detail.html.twig', [
             'company' => $company,
